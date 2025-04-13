@@ -8,19 +8,47 @@
       font-family: Arial, sans-serif;
       padding: 20px;
     }
+
     h1 {
       text-align: center;
     }
+
+    .progress-container {
+      margin: 10px 0;
+    }
+
+    .progress-bar {
+      width: 100%;
+      background-color: #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+      height: 20px;
+      margin-top: 5px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background-color: #4caf50;
+      transition: width 0.3s ease;
+      text-align: right;
+      color: white;
+      padding-right: 6px;
+      font-size: 12px;
+    }
+
     #score {
       text-align: center;
-      margin-bottom: 20px;
+      margin: 10px 0;
       font-size: 18px;
     }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 20px;
     }
+
     .section {
       border: 1px solid #ccc;
       border-radius: 8px;
@@ -28,17 +56,20 @@
       height: 600px;
       overflow-y: auto;
     }
+
     h2 {
       font-size: 16px;
       margin-top: 0;
       border-bottom: 1px solid #eee;
     }
+
     label {
       display: block;
       margin: 4px 0;
     }
+
     button {
-      margin: 10px auto;
+      margin: 15px auto;
       display: block;
       padding: 8px 16px;
       font-size: 14px;
@@ -49,8 +80,15 @@
 <body>
 
 <h1>🧠 Skill Progress Tracker</h1>
+
+<div class="progress-container">
+  <strong>Overall Progress:</strong>
+  <div class="progress-bar"><div class="progress-fill" id="mainProgress">0%</div></div>
+</div>
 <div id="score">Progress: 0 / 0</div>
+
 <div class="grid" id="tracker"></div>
+
 <button onclick="saveProgress()">💾 Save Progress</button>
 
 <script>
@@ -61,12 +99,22 @@ const data = {
   "100xDev": Array.from({length: 36}, (_, i) => `Week ${i}`)
 };
 
-const tracker = document.getElementById("tracker");
 let total = 0;
 let checked = 0;
 
 function updateScore() {
+  const percent = Math.round((checked / total) * 100);
   document.getElementById("score").textContent = `Progress: ${checked} / ${total}`;
+  const mainBar = document.getElementById("mainProgress");
+  mainBar.style.width = `${percent}%`;
+  mainBar.textContent = `${percent}%`;
+}
+
+function updateCategoryProgress(sectionId, sectionTotal, sectionChecked) {
+  const percent = Math.round((sectionChecked / sectionTotal) * 100);
+  const bar = document.getElementById(`bar-${sectionId}`);
+  bar.style.width = `${percent}%`;
+  bar.textContent = `${percent}%`;
 }
 
 function saveProgress() {
@@ -78,30 +126,47 @@ function saveProgress() {
 
 function loadProgress() {
   const saved = JSON.parse(localStorage.getItem("progressData") || "[]");
-  document.querySelectorAll('input[type="checkbox"]').forEach((cb, i) => {
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach((cb, i) => {
     cb.checked = saved[i] || false;
     if (cb.checked) checked++;
   });
-  updateScore();
 }
 
 function buildUI() {
-  Object.entries(data).forEach(([section, tasks], index) => {
+  const tracker = document.getElementById("tracker");
+
+  Object.entries(data).forEach(([section, tasks], sectionIndex) => {
     const div = document.createElement("div");
     div.className = "section";
+
     const h2 = document.createElement("h2");
     h2.textContent = section;
     div.appendChild(h2);
+
+    // Progress bar for section
+    const progressContainer = document.createElement("div");
+    progressContainer.className = "progress-container";
+    const bar = document.createElement("div");
+    bar.className = "progress-bar";
+    const fill = document.createElement("div");
+    fill.className = "progress-fill";
+    fill.id = `bar-${section}`;
+    fill.textContent = "0%";
+    bar.appendChild(fill);
+    progressContainer.appendChild(bar);
+    div.appendChild(progressContainer);
 
     tasks.forEach((task, idx) => {
       total++;
       const label = document.createElement("label");
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
-      checkbox.dataset.id = `${section}-${idx}`;
+      checkbox.dataset.section = section;
       checkbox.addEventListener("change", () => {
         checked += checkbox.checked ? 1 : -1;
         updateScore();
+        updateSectionBars();
       });
       label.appendChild(checkbox);
       label.append(` ${task}`);
@@ -112,9 +177,29 @@ function buildUI() {
   });
 
   loadProgress();
+  updateScore();
+  updateSectionBars();
+}
+
+function updateSectionBars() {
+  const sectionCounts = {};
+
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    const section = cb.dataset.section;
+    if (!sectionCounts[section]) {
+      sectionCounts[section] = { total: 0, checked: 0 };
+    }
+    sectionCounts[section].total++;
+    if (cb.checked) sectionCounts[section].checked++;
+  });
+
+  Object.entries(sectionCounts).forEach(([section, { total, checked }]) => {
+    updateCategoryProgress(section, total, checked);
+  });
 }
 
 buildUI();
 </script>
+
 </body>
 </html>
