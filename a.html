@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Progress Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    #score {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .section {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      height: 600px;
+      overflow-y: auto;
+    }
+    h2 {
+      font-size: 16px;
+      margin-top: 0;
+      border-bottom: 1px solid #eee;
+    }
+    label {
+      display: block;
+      margin: 4px 0;
+    }
+    button {
+      margin: 10px auto;
+      display: block;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🧠 Skill Progress Tracker</h1>
+<div id="score">Progress: 0 / 0</div>
+<div class="grid" id="tracker"></div>
+<button onclick="saveProgress()">💾 Save Progress</button>
+
+<script>
+const data = {
+  "SysDesign": ["AppChar", "Comms", "DbOpt", "Db", "ScaTech", "WebApp", "z_UC_DistWCraw", "z_UC_DropBox", "z_UC_Mess", "z_UC_RateLim", "z_UC_TypAhSugSer", "z_UC_Uber", "z_UC_UrlShor", "z_UC_Yt"],
+  "ML_PyTorch": ["Introduction", "PyTorch Fundamentals", "PyTorch Workflow", "PyTorch Neural Network Classification", "PyTorch Computer Vision", "PyTorch Custom Datasets", "PyTorch Going Modular", "PyTorch Transfer Learning", "PyTorch Experiment Tracking", "PyTorch Paper Replicating", "PyTorch Model Deployment", "Introduction to PyTorch2.0 and torch.compile"],
+  "Competitive Programming": ["1_Dp_Beginner", "2_Dp_Intermediate", "3_Dp_Advanced", "4_Tree_Beginner", "5_Tree_Advanced", "6_Graphs_Beginner", "7_Graphs_Intermediate", "8_Graphs_Advanced", "9_RQ_Beginner", "10_RQ_Advanced", "11_Bonus_Topics"],
+  "100xDev": Array.from({length: 36}, (_, i) => `Week ${i}`)
+};
+
+const tracker = document.getElementById("tracker");
+let total = 0;
+let checked = 0;
+
+function updateScore() {
+  document.getElementById("score").textContent = `Progress: ${checked} / ${total}`;
+}
+
+function saveProgress() {
+  const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+  const progress = Array.from(allCheckboxes).map(cb => cb.checked);
+  localStorage.setItem("progressData", JSON.stringify(progress));
+  alert("✅ Progress saved!");
+}
+
+function loadProgress() {
+  const saved = JSON.parse(localStorage.getItem("progressData") || "[]");
+  document.querySelectorAll('input[type="checkbox"]').forEach((cb, i) => {
+    cb.checked = saved[i] || false;
+    if (cb.checked) checked++;
+  });
+  updateScore();
+}
+
+function buildUI() {
+  Object.entries(data).forEach(([section, tasks], index) => {
+    const div = document.createElement("div");
+    div.className = "section";
+    const h2 = document.createElement("h2");
+    h2.textContent = section;
+    div.appendChild(h2);
+
+    tasks.forEach((task, idx) => {
+      total++;
+      const label = document.createElement("label");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.dataset.id = `${section}-${idx}`;
+      checkbox.addEventListener("change", () => {
+        checked += checkbox.checked ? 1 : -1;
+        updateScore();
+      });
+      label.appendChild(checkbox);
+      label.append(` ${task}`);
+      div.appendChild(label);
+    });
+
+    tracker.appendChild(div);
+  });
+
+  loadProgress();
+}
+
+buildUI();
+</script>
+</body>
+</html>
