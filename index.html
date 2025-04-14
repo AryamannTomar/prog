@@ -3,133 +3,549 @@
 <head>
   <meta charset="UTF-8">
   <title>Progress Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --accent: #4895ef;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #4cc9f0;
+      --danger: #f72585;
+      --warning: #f8961e;
+      --info: #560bad;
+      --border-radius: 12px;
+      --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f5f7ff;
+      color: var(--dark);
       padding: 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+      overflow-x: auto;
     }
 
     h1 {
       text-align: center;
+      margin: 20px 0 30px;
+      color: var(--secondary);
+      font-size: 2.5rem;
+      font-weight: 600;
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--primary));
+      border-radius: 2px;
     }
 
     .progress-container {
-      margin: 10px 0;
+      background: white;
+      padding: 20px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-bottom: 30px;
+      transition: var(--transition);
+    }
+
+    .progress-container:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
     }
 
     .progress-bar {
       width: 100%;
-      background-color: #e0e0e0;
-      border-radius: 8px;
+      background-color: #e9ecef;
+      border-radius: 20px;
       overflow: hidden;
       height: 20px;
-      margin-top: 5px;
+      margin-top: 10px;
+      position: relative;
     }
 
     .progress-fill {
       height: 100%;
       width: 0%;
-      background-color: #4caf50;
-      transition: width 0.3s ease;
+      background: linear-gradient(90deg, var(--accent), var(--primary));
+      transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1);
       text-align: right;
       color: white;
-      padding-right: 6px;
       font-size: 12px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        rgba(255, 255, 255, 0.1) 100%
+      );
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
     }
 
     #score {
       text-align: center;
-      margin: 10px 0;
-      font-size: 18px;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--secondary);
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
+    .score-number {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .sections-container {
+      display: flex;
       gap: 20px;
+      padding-bottom: 20px;
+      overflow-x: auto;
     }
 
     .section {
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 10px;
-      height: 600px;
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 20px;
+      min-width: 300px;
+      max-height: 600px;
       overflow-y: auto;
+      box-shadow: var(--box-shadow);
+      transition: var(--transition);
+      border-top: 4px solid var(--accent);
+      flex: 1;
+    }
+
+    .section:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .section::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .section::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    .section::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 10px;
     }
 
     h2 {
-      font-size: 16px;
-      margin-top: 0;
-      border-bottom: 1px solid #eee;
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      color: var(--secondary);
+      padding-bottom: 8px;
+      border-bottom: 2px solid #eee;
+      display: flex;
+      align-items: center;
     }
 
-    label {
+    h2::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent);
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .section-progress {
+      font-size: 0.9rem;
+      color: var(--primary);
+      margin-left: auto;
+      font-weight: 500;
+    }
+
+    .checklist {
+      list-style: none;
+    }
+
+    .checklist-item {
+      margin: 8px 0;
+      position: relative;
+      padding-left: 30px;
+    }
+
+    .checklist-item label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: var(--transition);
+      padding: 8px 10px;
+      border-radius: 6px;
+    }
+
+    .checklist-item label:hover {
+      background-color: rgba(72, 149, 239, 0.1);
+    }
+
+    .checklist-item input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+
+    .checkmark {
+      position: absolute;
+      left: 0;
+      height: 20px;
+      width: 20px;
+      background-color: white;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      transition: var(--transition);
+    }
+
+    .checklist-item:hover .checkmark {
+      border-color: var(--accent);
+    }
+
+    .checklist-item input:checked ~ .checkmark {
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+    }
+
+    .checklist-item input:checked ~ .checkmark:after {
       display: block;
-      margin: 4px 0;
+    }
+
+    .checklist-item .checkmark:after {
+      left: 6px;
+      top: 2px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .checklist-text {
+      margin-left: 10px;
     }
 
     button {
-      margin: 15px auto;
-      display: block;
-      padding: 8px 16px;
-      font-size: 14px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 1rem;
       cursor: pointer;
+      border-radius: 50px;
+      display: block;
+      margin: 30px auto;
+      transition: var(--transition);
+      box-shadow: 0 4px 6px rgba(67, 97, 238, 0.3);
+      font-weight: 500;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(67, 97, 238, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0.1) 100%
+      );
+      transform: translateX(-100%);
+    }
+
+    button:hover::after {
+      animation: shimmer 1.5s infinite;
+    }
+
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: var(--accent);
+      opacity: 0;
+      z-index: 1000;
+      animation: confetti-fall 3s ease-in-out forwards;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(1000px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--primary);
+      color: white;
+      padding: 15px 25px;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    @media (max-width: 1200px) {
+      .sections-container {
+        flex-wrap: wrap;
+      }
+      
+      .section {
+        min-width: calc(50% - 20px);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .section {
+        min-width: 100%;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+      }
     }
   </style>
 </head>
 <body>
+<div class="container">
+  <h1>🧠 Skill Progress Tracker</h1>
 
-<h1>🧠 Skill Progress Tracker</h1>
+  <div class="progress-container">
+    <div class="progress-header">
+      <strong>Overall Progress:</strong>
+      <span class="section-progress" id="mainProgressText">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="mainProgress" style="width: 0%"></div>
+    </div>
+  </div>
+  
+  <div id="score">Progress: <span class="score-number" id="checked-count">0</span> / <span class="score-number">0</span></div>
 
-<div class="progress-container">
-  <strong>Overall Progress:</strong>
-  <div class="progress-bar"><div class="progress-fill" id="mainProgress">0%</div></div>
+  <div class="sections-container" id="tracker"></div>
+
+  <button onclick="saveProgress()">💾 Save Progress</button>
 </div>
-<div id="score">Progress: 0 / 0</div>
 
-<div class="grid" id="tracker"></div>
-
-<button onclick="saveProgress()">💾 Save Progress</button>
+<div id="toast" class="toast"></div>
 
 <script>
 const data = {
-  "SysDesign": ["AppChar", "Comms", "DbOpt", "Db", "ScaTech", "WebApp", "z_UC_DistWCraw", "z_UC_DropBox", "z_UC_Mess", "z_UC_RateLim", "z_UC_TypAhSugSer", "z_UC_Uber", "z_UC_UrlShor", "z_UC_Yt"],
-  "ML_PyTorch": ["Introduction", "PyTorch Fundamentals", "PyTorch Workflow", "PyTorch Neural Network Classification", "PyTorch Computer Vision", "PyTorch Custom Datasets", "PyTorch Going Modular", "PyTorch Transfer Learning", "PyTorch Experiment Tracking", "PyTorch Paper Replicating", "PyTorch Model Deployment", "Introduction to PyTorch2.0 and torch.compile"],
+  "SysDesign": ["1_AppChar", "2_Comms", "3_DbOpt", "4_Db", "5_ScaTech", "6_WebApp", "7_z_UC_DistWCraw", "8_z_UC_DropBox", "9_z_UC_Mess", "10_z_UC_RateLim", "11_z_UC_TypAhSugSer", "12_z_UC_Uber", "13_z_UC_UrlShor", "14_z_UC_Yt"],
+  "ML_PyTorch": ["1_Introduction", "2_PyTorch Fundamentals", "3_PyTorch Workflow", "4_PyTorch Neural Network Classification", "5_PyTorch Computer Vision", "6_PyTorch Custom Datasets", "7_PyTorch Going Modular", "8_PyTorch Transfer Learning", "9_PyTorch Experiment Tracking", "10_PyTorch Paper Replicating", "11_PyTorch Model Deployment", "12_Introduction to PyTorch2.0 and torch.compile"],
   "Competitive Programming": ["1_Dp_Beginner", "2_Dp_Intermediate", "3_Dp_Advanced", "4_Tree_Beginner", "5_Tree_Advanced", "6_Graphs_Beginner", "7_Graphs_Intermediate", "8_Graphs_Advanced", "9_RQ_Beginner", "10_RQ_Advanced", "11_Bonus_Topics"],
-  "100xDev": Array.from({length: 36}, (_, i) => `Week ${i}`)
+  "100xDev": Array.from({length: 36}, (_, i) => `Week ${i+1}`),
+  "KrishNaik_GenAI": [
+    "1_Introduction", "2_Python Control Flow", "3_Data Structures Using Python", "4_Functions In Python", 
+    "5_Importing, Creating Modules And Packages", "6_File Handling In Python", "7_Exception Handling", 
+    "8_OOPS Classes And Objects", "9_Streamlit With Python", "10_Machine Learning For NLP (Prerequisites)", 
+    "11_Deep Learning For NLP (Prerequisites)", "12_Simple RNN Indepth Intuition", "13_ANN Project Implementation", 
+    "14_End To End Deep Learning Projects With Simple RNN", "15_LSTM RNN Indepth Intuition", 
+    "16_LSTM And GRU End To End Deep Learning Project - Predicting", "17_Bidirectional RNN Indepth Intuition", 
+    "18_Encoder And Decoder | Sequence To Sequence…", "19_Attention Mechanism - Seq2Seq Networks", "20_Transformers", 
+    "21_Introduction To Generative AI And LLM Models", "22_Introduction To Langchain For Generative AI", 
+    "23_Getting Started With Langchain And OpenAI", "24_Important Components And Modules In Langchain", 
+    "25_Getting Started With OpenAI And Ollama", "26_Building Basic LLM Application Using LCEL (LangChain Expression…)", 
+    "27_Building Chatbots With Conversation History Using Langchain", "28_Conversational Q&A Chatbot With Message History", 
+    "29_End To End Q&A Chatbot GEN AI App With…", "30_RAG Document Q&A With GROQ API And LLama3", 
+    "31_Conversational Q&A Chatbot - Chat With PDF Along With Chat History", "32_Search Engine With Langchain Tools And Agents", 
+    "33_Gen AI Project - Chat With SQL DB With Langchain SQL Toolkit and…", "34_Text Summarization With Langchain", 
+    "35_Gen AI Projects - YouTube Video And Website URL Content Summarization", "36_Text To Math Problem Solver Using Google Gemma 2", 
+    "37_Huggingface And Langchain Integration", "38_PDF Query RAG With Langchain And AstraDB", 
+    "39_MultiLanguage Code Assistant Using CodeLama", "40_Deployment Of Gen AI Apps In Streamlit and HuggingSpace", 
+    "41_Generative AI With AWS (Bonus)", "42_Getting Started With Nvidia NIM and Langchain", 
+    "43_Creating Multi AI Agents Using CrewAI For Real World Usecases", "44_Hybrid Search RAG With Vector Database And Langchain", 
+    "45_Introduction To Graph Databases And Cypher Query Language…", "46_Practical Implementation With GraphDB With Langchain", 
+    "47_Detailed Intuition and Implementation Of Finetuning LLM Models", "48_End To End Finetuning LLM Models With Lamini Platform", 
+    "49_Building Stateful, Multi-Actor Applications Using LangGraph"
+  ]
 };
 
 let total = 0;
 let checked = 0;
+let lastProgress = 0;
+
+function showToast(message, duration = 3000) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, duration);
+}
+
+function createConfetti() {
+  const colors = ['#4361ee', '#3f37c9', '#4895ef', '#4cc9f0', '#f72585', '#560bad'];
+  for (let i = 0; i < 50; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.left = Math.random() * 100 + 'vw';
+    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.width = Math.random() * 10 + 5 + 'px';
+    confetti.style.height = Math.random() * 10 + 5 + 'px';
+    confetti.style.animationDuration = Math.random() * 2 + 2 + 's';
+    document.body.appendChild(confetti);
+    
+    setTimeout(() => {
+      confetti.remove();
+    }, 3000);
+  }
+}
 
 function updateScore() {
   const percent = Math.round((checked / total) * 100);
-  document.getElementById("score").textContent = `Progress: ${checked} / ${total}`;
+  document.getElementById('checked-count').textContent = checked;
+  
   const mainBar = document.getElementById("mainProgress");
-  mainBar.style.width = `${percent}%`;
-  mainBar.textContent = `${percent}%`;
+  const mainText = document.getElementById("mainProgressText");
+  
+  // Animate the progress bar
+  let start = null;
+  const duration = 800;
+  const startProgress = lastProgress;
+  const change = percent - startProgress;
+  
+  function animate(timestamp) {
+    if (!start) start = timestamp;
+    const progress = Math.min((timestamp - start) / duration, 1);
+    const currentProgress = startProgress + change * progress;
+    
+    mainBar.style.width = `${currentProgress}%`;
+    mainText.textContent = `${Math.round(currentProgress)}%`;
+    
+    if (progress < 1) {
+      window.requestAnimationFrame(animate);
+    }
+  }
+  
+  window.requestAnimationFrame(animate);
+  lastProgress = percent;
+
+  // Check for completion
+  if (percent === 100 && checked === total && total > 0) {
+    showToast("🎉 Congratulations! You've completed everything!", 5000);
+    createConfetti();
+  }
 }
 
 function updateCategoryProgress(sectionId, sectionTotal, sectionChecked) {
   const percent = Math.round((sectionChecked / sectionTotal) * 100);
   const bar = document.getElementById(`bar-${sectionId}`);
-  bar.style.width = `${percent}%`;
-  bar.textContent = `${percent}%`;
+  const text = document.getElementById(`text-${sectionId}`);
+  
+  if (bar) {
+    bar.style.width = `${percent}%`;
+  }
+  if (text) {
+    text.textContent = `${percent}%`;
+  }
 }
 
 function saveProgress() {
   const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
   const progress = Array.from(allCheckboxes).map(cb => cb.checked);
   localStorage.setItem("progressData", JSON.stringify(progress));
-  alert("✅ Progress saved!");
+  showToast("✅ Progress saved!");
 }
 
 function loadProgress() {
   const saved = JSON.parse(localStorage.getItem("progressData") || "[]");
   const checkboxes = document.querySelectorAll('input[type="checkbox"]');
   checkboxes.forEach((cb, i) => {
-    cb.checked = saved[i] || false;
-    if (cb.checked) checked++;
+    if (saved[i]) {
+      cb.checked = true;
+      checked++;
+    }
   });
 }
 
@@ -142,6 +558,13 @@ function buildUI() {
 
     const h2 = document.createElement("h2");
     h2.textContent = section;
+    
+    const progressText = document.createElement("span");
+    progressText.className = "section-progress";
+    progressText.id = `text-${section}`;
+    progressText.textContent = "0%";
+    h2.appendChild(progressText);
+    
     div.appendChild(h2);
 
     // Progress bar for section
@@ -152,14 +575,21 @@ function buildUI() {
     const fill = document.createElement("div");
     fill.className = "progress-fill";
     fill.id = `bar-${section}`;
-    fill.textContent = "0%";
+    fill.style.width = "0%";
     bar.appendChild(fill);
     progressContainer.appendChild(bar);
     div.appendChild(progressContainer);
 
+    const list = document.createElement("ul");
+    list.className = "checklist";
+
     tasks.forEach((task, idx) => {
       total++;
+      const item = document.createElement("li");
+      item.className = "checklist-item";
+      
       const label = document.createElement("label");
+      
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.dataset.section = section;
@@ -167,14 +597,38 @@ function buildUI() {
         checked += checkbox.checked ? 1 : -1;
         updateScore();
         updateSectionBars();
+        
+        // Small animation when checking
+        if (checkbox.checked) {
+          label.style.transform = "scale(1.02)";
+          setTimeout(() => {
+            label.style.transform = "scale(1)";
+          }, 200);
+        }
       });
+      
+      const checkmark = document.createElement("span");
+      checkmark.className = "checkmark";
+      
+      const text = document.createElement("span");
+      text.className = "checklist-text";
+      text.textContent = task;
+      
       label.appendChild(checkbox);
-      label.append(` ${task}`);
-      div.appendChild(label);
+      label.appendChild(checkmark);
+      label.appendChild(text);
+      item.appendChild(label);
+      list.appendChild(item);
     });
 
+    div.appendChild(list);
     tracker.appendChild(div);
   });
+
+  // Update total count in the score display
+  document.getElementById('score').innerHTML = `
+    Progress: <span class="score-number" id="checked-count">0</span> / <span class="score-number">${total}</span>
+  `;
 
   loadProgress();
   updateScore();
