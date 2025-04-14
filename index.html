@@ -18,6 +18,7 @@
       --border-radius: 12px;
       --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --purple: #7b2cbf;
     }
 
     * {
@@ -98,7 +99,7 @@
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, var(--accent), var(--primary));
-      transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+      transition: width 0.6s ease-out;
       text-align: right;
       color: white;
       font-size: 12px;
@@ -111,7 +112,12 @@
       overflow: hidden;
     }
 
-    .progress-fill::after {
+    /* Main progress bar (purple) */
+    #mainProgress {
+      background: linear-gradient(90deg, var(--purple), #9d4edd);
+    }
+
+    .progress-fill::before {
       content: '';
       position: absolute;
       top: 0;
@@ -119,17 +125,22 @@
       right: 0;
       bottom: 0;
       background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0.1) 0%,
-        rgba(255, 255, 255, 0.4) 50%,
-        rgba(255, 255, 255, 0.1) 100%
+        45deg,
+        rgba(255, 255, 255, 0.15) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.15) 75%,
+        transparent 75%,
+        transparent
       );
-      animation: shimmer 2s infinite;
+      background-size: 20px 20px;
+      animation: progress-stripes 1s linear infinite;
     }
 
-    @keyframes shimmer {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
+    @keyframes progress-stripes {
+      0% { background-position: 0 0; }
+      100% { background-position: 20px 0; }
     }
 
     #score {
@@ -219,7 +230,7 @@
     .checklist-item {
       margin: 8px 0;
       position: relative;
-      padding-left: 30px;
+      padding-left: 0;
     }
 
     .checklist-item label {
@@ -236,44 +247,31 @@
     }
 
     .checklist-item input[type="checkbox"] {
-      position: absolute;
-      opacity: 0;
+      position: relative;
+      opacity: 1;
       cursor: pointer;
-      height: 0;
-      width: 0;
-    }
-
-    .checkmark {
-      position: absolute;
-      left: 0;
       height: 20px;
       width: 20px;
-      background-color: white;
+      margin-right: 10px;
+      appearance: none;
+      -webkit-appearance: none;
       border: 2px solid #ddd;
       border-radius: 4px;
       transition: var(--transition);
     }
 
-    .checklist-item:hover .checkmark {
+    .checklist-item input[type="checkbox"]:hover {
       border-color: var(--accent);
     }
 
-    .checklist-item input:checked ~ .checkmark {
+    .checklist-item input[type="checkbox"]:checked {
       background-color: var(--primary);
       border-color: var(--primary);
     }
 
-    .checkmark:after {
+    .checklist-item input[type="checkbox"]:checked::after {
       content: "";
       position: absolute;
-      display: none;
-    }
-
-    .checklist-item input:checked ~ .checkmark:after {
-      display: block;
-    }
-
-    .checklist-item .checkmark:after {
       left: 6px;
       top: 2px;
       width: 5px;
@@ -284,7 +282,7 @@
     }
 
     .checklist-text {
-      margin-left: 10px;
+      margin-left: 0;
     }
 
     button {
@@ -597,25 +595,13 @@ function buildUI() {
         checked += checkbox.checked ? 1 : -1;
         updateScore();
         updateSectionBars();
-        
-        // Small animation when checking
-        if (checkbox.checked) {
-          label.style.transform = "scale(1.02)";
-          setTimeout(() => {
-            label.style.transform = "scale(1)";
-          }, 200);
-        }
       });
-      
-      const checkmark = document.createElement("span");
-      checkmark.className = "checkmark";
       
       const text = document.createElement("span");
       text.className = "checklist-text";
       text.textContent = task;
       
       label.appendChild(checkbox);
-      label.appendChild(checkmark);
       label.appendChild(text);
       item.appendChild(label);
       list.appendChild(item);
