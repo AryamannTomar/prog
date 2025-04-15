@@ -159,9 +159,9 @@
 
     .sections-container {
       display: flex;
+      flex-wrap: wrap;
       gap: 20px;
       padding-bottom: 20px;
-      overflow-x: auto;
     }
 
     .section {
@@ -174,7 +174,8 @@
       box-shadow: var(--box-shadow);
       transition: var(--transition);
       border-top: 4px solid var(--accent);
-      flex: 1;
+      flex: 1 0 calc(20% - 20px); /* Makes each section take exactly 20% width minus gap */
+      max-width: calc(20% - 20px); /* Ensures all sections have the same width */
     }
 
     .section:hover {
@@ -372,19 +373,24 @@
       opacity: 1;
     }
 
-    @media (max-width: 1200px) {
-      .sections-container {
-        flex-wrap: wrap;
-      }
-      
+    @media (max-width: 1600px) {
       .section {
-        min-width: calc(50% - 20px);
+        flex: 1 0 calc(33.333% - 20px); /* 3 per row */
+        max-width: calc(33.333% - 20px);
       }
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 1200px) {
       .section {
-        min-width: 100%;
+        flex: 1 0 calc(50% - 20px); /* 2 per row */
+        max-width: calc(50% - 20px);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .section {
+        flex: 1 0 100%; /* 1 per row */
+        max-width: 100%;
       }
       
       h1 {
@@ -447,6 +453,16 @@ const data = {
     "45_Introduction To Graph Databases And Cypher Query Language…", "46_Practical Implementation With GraphDB With Langchain", 
     "47_Detailed Intuition and Implementation Of Finetuning LLM Models", "48_End To End Finetuning LLM Models With Lamini Platform", 
     "49_Building Stateful, Multi-Actor Applications Using LangGraph"
+  ],
+  "LLM Engineering:AI_LLM_Agents": [
+    "1_BuildYourFirstLLMProduct: ExploringTopModels&Transformers",
+    "2_BuildMultiModalChatbot: LLMs,GradioUI,AgentsinAction",
+    "3_OpenSourceGenAI: BuildingAutomatedSolutionswHuggingFace",
+    "4_LLMShowDown: EvaluatingModelsforCodeGenerationBusinessTasks",
+    "5_MasteringRAG: BuildAdvancedSolutionswVectorEmbeddingsLangChain",
+    "6_FineTuningFrontierLLMLoRA/QLoRA",
+    "7_FineTunedOpenSrcCompetewFrontierinPricePrediction",
+    "8_BuildAutonomousMultiAgentSystemCollaboratingwModels"
   ]
 };
 
